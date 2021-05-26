@@ -17,11 +17,12 @@
  * Define Global Variables
  *
  */
+let sectionPosition = [];
+let sections;
 let scrollPosition = 0;
-let sectionPosition = [0, 0, 0];
-let sectionCount = 3;
-let sections = [];
-const menuList = document.getElementById("navbar__list");
+let sectionCount = document.getElementsByClassName("landing__container").length;
+let currentSection = 0;
+let newCurrent;
 
 /**
  * End Global Variables
@@ -31,20 +32,57 @@ const menuList = document.getElementById("navbar__list");
 // Search all sections and add them to an array(sections)
 function SetSectionElements() {
   sections = [];
+  sectionCount = document.getElementsByClassName("landing__container").length;
   for (let i = 1; i <= sectionCount; i++) {
     let section = document.getElementById(`section${i}`);
-
     sections.push(section);
+    sectionPosition.push(0);
   }
 }
-SetSectionElements();
 
-function CreateMenu() {
-  for (const section of sections) {
-    menuList.innerHTML += `<li>${section.getAttribute("data-nav")}</li>`;
+// Sets current section Y coordinates
+function SetSectionPosition() {
+  for (let i = 0; i < sectionCount; i++) {
+    const bodyRect = document.body.getBoundingClientRect();
+    const sectionRect = sections[i].getBoundingClientRect();
+    sectionPosition[i] =
+      sectionRect.top -
+      bodyRect.top +
+      parseFloat(
+        window.getComputedStyle(
+          document.getElementsByClassName("landing__container")[0]
+        ).paddingTop
+      );
+    if (window.innerWidth < 560) {
+      sectionPosition[i] += 80;
+    } else {
+      sectionPosition[i] += 160;
+    }
   }
 }
-CreateMenu();
+
+// Detects if the width of the window has changed and set the
+// each section's Y to coordinate with it
+window.addEventListener("resize", (e) => {
+  for (let i = 0; i < sectionCount; i++) {
+    const bodyRect = document.body.getBoundingClientRect();
+    const sectionRect = sections[i].getBoundingClientRect();
+    sectionPosition[i] =
+      sectionRect.top -
+      bodyRect.top +
+      parseFloat(
+        window.getComputedStyle(
+          document.getElementsByClassName("landing__container")[0]
+        ).paddingTop
+      );
+    if (window.innerWidth < 560) {
+      sectionPosition[i] += 80;
+    } else {
+      sectionPosition[i] += 160;
+    }
+  }
+});
+
 /**
  * End Helper Functions
  * Begin Main Functions
@@ -52,12 +90,28 @@ CreateMenu();
  */
 
 // build the nav
-
+// Adds Sections to the Menu
+function CreateMenuItems() {
+  for (let i = 0; i < sectionCount; i++) {
+    document.getElementById("navbar__list").innerHTML += `<a href="#section${
+      i + 1
+    }"<li>${sections[i].getAttribute("data-nav")}</li></a>`;
+  }
+}
+// Changes the menu items to be visible to the color assigned
+function ChangeMenuItemsColor(color) {
+  document.getElementById("navbar__list").style.color = color;
+}
 // Add class 'active' to section when near top of viewport
-window.addEventListener("scroll", (e) => {
-  scrollPosition = window.scrollY;
-  console.log(scrollPosition);
-});
+function SetNewCurrentSection(newCurrent) {
+  document
+    .querySelector(".your-active-class")
+    .classList.remove("your-active-class");
+  document
+    .querySelector(`#section${newCurrent}`)
+    .classList.add("your-active-class");
+  currentSection = newCurrent - 1;
+}
 
 // Scroll to anchor ID using scrollTO event
 
@@ -68,7 +122,22 @@ window.addEventListener("scroll", (e) => {
  */
 
 // Build menu
-
+SetSectionElements();
+CreateMenuItems();
+ChangeMenuItemsColor("black");
+SetSectionPosition();
 // Scroll to section on link click
 
 // Set sections as active
+window.addEventListener("scroll", (e) => {
+  scrollPosition = window.scrollY;
+  for (let i = 0; i < sectionCount; i++) {
+    if (scrollPosition <= sectionPosition[i]) {
+      newCurrent = i;
+      break;
+    }
+  }
+  if (newCurrent !== currentSection) {
+    SetNewCurrentSection(newCurrent + 1);
+  }
+});
