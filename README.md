@@ -18,4 +18,4 @@ ex) `AddSection(3);` will generate 3 new sections.
   ex) `ChangeMenuItemsColor('blue');`: will change the menu text color to blue.
 
 ## License
-The content of this repository is covered under the [MIT License]
+The content of this repository is covered under the [MIT License](https://github.com/youngkim0/js-project/blob/main/LICENSE)
