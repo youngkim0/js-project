@@ -82,6 +82,31 @@ window.addEventListener("resize", (e) => {
     }
   }
 });
+// Creates a new section by copying an existing section
+function CreateNewSection() {
+  const newSection = document.createElement("section");
+  newSection.innerHTML = document.querySelector("#section1").innerHTML;
+  newSection.toggleAttribute("id");
+  newSection.setAttribute("id", `section${sectionCount + 1}`);
+  newSection.toggleAttribute("data-nav");
+  newSection.setAttribute("data-nav", `section ${sectionCount + 1}`);
+  newSection.children[0].children[0].textContent = `Section ${
+    sectionCount + 1
+  }`;
+  return newSection;
+}
+
+// Adds a section dynamically at the end
+function AddSection(count) {
+  const sectionCountBefore = sectionCount;
+  for (let i = 0; i < count; i++) {
+    document.querySelector("main").appendChild(CreateNewSection());
+    SetSectionElements();
+    CreateMenuItems(sectionCount - 1);
+    SetSectionPosition();
+    ScrollToLink();
+  }
+}
 
 /**
  * End Helper Functions
@@ -91,11 +116,19 @@ window.addEventListener("resize", (e) => {
 
 // build the nav
 // Adds Sections to the Menu
-function CreateMenuItems() {
-  for (let i = 0; i < sectionCount; i++) {
-    document.getElementById("navbar__list").innerHTML += `<a href="#section${
-      i + 1
-    }"<li>${sections[i].getAttribute("data-nav")}</li></a>`;
+function CreateMenuItems(n) {
+  for (let i = n; i < sectionCount; i++) {
+    document.getElementById(
+      "navbar__list"
+    ).innerHTML += `<li class="menuItem">${sections[i].getAttribute(
+      "data-nav"
+    )}</li>`;
+  }
+  document.getElementById("navbar__list").style.display = "flex";
+  document.getElementById("navbar__list").style.justifyContent = "space-evenly";
+  const menuItems = document.getElementsByClassName("menuItem");
+  for (let i = n; i < sectionCount; i++) {
+    menuItems[i].style.cursor = "pointer";
   }
 }
 // Changes the menu items to be visible to the color assigned
@@ -114,6 +147,20 @@ function SetNewCurrentSection(newCurrent) {
 }
 
 // Scroll to anchor ID using scrollTO event
+function ScrollToLink() {
+  const elements = document.querySelectorAll(".menuItem");
+  for (let i = 0; i < sectionCount; i++) {
+    elements[i].addEventListener(
+      "click",
+      (e) => {
+        console.log("clicked");
+        scrollTo(0, sectionPosition[i]);
+        e.preventDefault();
+      },
+      false
+    );
+  }
+}
 
 /**
  * End Main Functions
@@ -122,10 +169,13 @@ function SetNewCurrentSection(newCurrent) {
  */
 
 // Build menu
+
 SetSectionElements();
-CreateMenuItems();
-ChangeMenuItemsColor("black");
+CreateMenuItems(0);
+ChangeMenuItemsColor("blue");
 SetSectionPosition();
+ScrollToLink();
+AddSection(3);
 // Scroll to section on link click
 
 // Set sections as active
