@@ -154,7 +154,11 @@ function ScrollToLink() {
       "click",
       (e) => {
         console.log("clicked");
-        scrollTo(0, sectionPosition[i]);
+        scrollTo({
+          left: 0,
+          top: sectionPosition[i],
+          behavior: "smooth",
+        });
         e.preventDefault();
       },
       false
